@@ -24,7 +24,7 @@ class Module:
             'MinLanguageVersion' : '2',
 
             'Comments': [
-                ''
+                'At the moment, this modules works only with IE and cuts the agent connection (so not working)'
             ]
         }
 
