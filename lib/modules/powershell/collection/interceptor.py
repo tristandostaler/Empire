@@ -83,7 +83,7 @@ class Module:
                 'Value'         :   ''
             },
             'Domains' : {
-                'Description'   :   'Accepts a list of domains to create Trusted root Certs for at the beginning of script run. List should be delimited with a comma ',' .',
+                'Description'   :   'Accepts a list of domains to create Trusted root Certs for at the beginning of script run. List should be delimited with a comma "," .',
                 'Required'      :   False,
                 'Value'         :   ''
             },
