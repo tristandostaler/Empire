@@ -73,12 +73,12 @@ class Module:
                 'Value'         :   'False'
             },
             'SearchString' : {
-                'Description'   :   'If Tamper is enabled, this will search for a string to be replace. To be used with 'ReplaceString' parameter',
+                'Description'   :   'If Tamper is enabled, this will search for a string to be replace. To be used with "ReplaceString" parameter',
                 'Required'      :   False,
                 'Value'         :   ''
             },
             'ReplaceString' : {
-                'Description'   :   'If Tamper is enabled, this will be the string that replaces the string identified by the 'SearchString' parameter',
+                'Description'   :   'If Tamper is enabled, this will be the string that replaces the string identified by the "SearchString" parameter',
                 'Required'      :   False,
                 'Value'         :   ''
             },
