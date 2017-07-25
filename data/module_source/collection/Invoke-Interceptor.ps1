@@ -868,4 +868,3 @@ function Set-Interceptor{
 
     Main
 }
-Set-Interceptor -AutoProxyConfig
