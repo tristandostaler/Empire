@@ -146,7 +146,7 @@ function Set-Interceptor{
             } 
             else 
             { 
-                Write-Output "Enabling 'Automatically detect proxy settings'." 
+                Write-Output "Enabling 'Automatically detect proxy settings'." | Out-String
                 $conSet[$flagIndex] = $conSet[$flagIndex] -bor $autoProxyFlag 
                 $conSet[4]++ 
                 Set-ItemProperty -Path $regKeyPath -Name DefaultConnectionSettings -Value $conSet 
@@ -158,7 +158,7 @@ function Set-Interceptor{
             { 
                 # 'Automatically detect proxy settings' was enabled, adding one disables it.
                 $wasEnabled = $True 
-                Write-Output "Disabling 'Automatically detect proxy settings'." 
+                Write-Output "Disabling 'Automatically detect proxy settings'." | Out-String 
                 $mask = -bnot $autoProxyFlag 
                 $conSet[$flagIndex] = $conSet[$flagIndex] -band $mask 
                 $conSet[4]++ 
@@ -169,11 +169,11 @@ function Set-Interceptor{
          $conSet = $(Get-ItemProperty $regKeyPath).DefaultConnectionSettings 
             if ($($conSet[$flagIndex] -band $autoProxyFlag) -ne $autoProxyFlag) 
             { 
-                Write-Output "'Automatically detect proxy settings' is disabled." 
+                Write-Output "'Automatically detect proxy settings' is disabled." | Out-String 
             } 
              else 
             { 
-                Write-Output "'Automatically detect proxy settings' is enabled." 
+                Write-Output "'Automatically detect proxy settings' is enabled." | Out-String 
             } 
         return $wasEnabled
     }
@@ -243,7 +243,7 @@ function Set-Interceptor{
 		    }
 	    }
 
-	    Write-Output "Certificates Removed"
+	    Write-Output "Certificates Removed" | Out-String
 		
     }
 
@@ -253,7 +253,7 @@ function Set-Interceptor{
 
     function Invoke-CreateCertificate([string] $certSubject, [bool] $isCA)
     {
-        Write-Output "Setting up certificate for" $certSubject
+        Write-Output "Setting up certificate for $certSubject" | Out-String
 	    $CAsubject = $certSubject
 	    $dn = new-object -com "X509Enrollment.CX500DistinguishedName"
 	    $dn.Encode( "CN=" + $CAsubject, $dn.X500NameFlags.X500NameFlags.XCN_CERT_NAME_STR_NONE)
@@ -399,7 +399,7 @@ function Set-Interceptor{
 		
 		    [byte[]] $rawHeaderBytes = [System.Text.Encoding]::Ascii.GetBytes($rstring)
 		
-		    Write-Output $rstring 
+		    Write-Output $rstring | Out-String
             #[Console]::WriteLine($rstring)
 		
 		    [void][byte[]] $outdata 
@@ -620,7 +620,8 @@ function Set-Interceptor{
 			     } while ( $clientStream.DataAvailable  )
 			
 			    $SSLRequest = [System.Text.Encoding]::UTF8.GetString($sslbyteClientRequest)
-			    Write-Output $SSLRequest -Fore Yellow
+			    Write-Output $SSLRequest | Out-String
+                #Write-Host $SSLRequest -Fore Yellow
                 #[Console]::WriteLine("SSL Connect Request: " + $SSLRequest)
 			
 			    [string[]] $SSLrequestArray = ($SSLRequest -split '[\r\n]') |? {$_} 
@@ -644,7 +645,8 @@ function Set-Interceptor{
 		    }#End CONNECT/SSL Processing
 		    Else
 		    {
-			    Write-Output $requestString -Fore Cyan
+                Write-Output $requestString | Out-String
+			    #Write-Host $requestString -Fore Cyan
                 #[Console]::WriteLine("SSL Request: " + $requestString)
 			    [byte[]] $proxiedResponse = Send-ServerHttpRequest $methodParse[1] $methodParse[0] $byteClientRequest $proxy
 			    if($proxiedResponse[0] -eq '0x00')
@@ -676,13 +678,13 @@ function Set-Interceptor{
     function SetSystemWideProxy([int] $port){
         try
         {
-            Write-Output "Adding system wide proxy"
+            Write-Output "Adding system wide proxy" | Out-String
             $reg = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
             $settings = Get-ItemProperty -Path $reg
             $backup = $null
             if($settings.ProxyEnable)
             {
-                Write-Output "Present proxy server: " $settings.ProxyServer
+                Write-Output "Present proxy server: $($settings.ProxyServer)" | Out-String
                 $backup = $settings.ProxyServer
             }
             Set-ItemProperty -Path $reg -Name ProxyServer -Value "localhost:$port"
@@ -698,12 +700,12 @@ function Set-Interceptor{
     function UnsetSystemWideProxy([string] $backup){
         try
         {
-            Write-Output "Removing system wide proxy"
+            Write-Output "Removing system wide proxy" | Out-String
             $reg = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
             Set-ItemProperty -Path $reg -Name ProxyEnable -Value 0
             Remove-ItemProperty -Path $reg -Name ProxyServer
             if(![string]::IsNullOrEmpty($backup)){
-                Write-Output "Reinstalling old proxy: " $backup
+                Write-Output "Reinstalling old proxy: $backup" | Out-String
                 Set-ItemProperty -Path $reg -Name ProxyServer -Value $backup
                 Set-ItemProperty -Path $reg -Name ProxyEnable -Value 1
             }
@@ -739,7 +741,7 @@ function Set-Interceptor{
              [string[]] $domainList = ($Domains -split '[,]') |? {$_} 
              foreach ($d in $domainList)
              {
-                 Write-Output $d
+                 Write-Output $d | Out-String
                  $sslcertfake = (Get-ChildItem Cert:\LocalMachine\My | Where-Object {$_.Subject -eq "CN=" + $d })
 
                  if($sslcertfake -eq $null){
@@ -801,7 +803,7 @@ function Set-Interceptor{
 		    #Set-ItemProperty -path $regKey ProxyEnable -value 1 
 		    #Set-ItemProperty -path $regKey ProxyServer -value $proxyServerToDefine 
             $backup = SetSystemWideProxy $port
-		    Write-Output "Proxy is now enabled" 
+		    Write-Output "Proxy is now enabled" | Out-String
 		 
 	    }
 	
@@ -826,19 +828,19 @@ function Set-Interceptor{
 	    if($ProxyServer)
 	    {
 		    $proxy = New-Object System.Net.WebProxy($ProxyServer, $ProxyPort)
-		    Write-Output "Using Proxy Server $ProxyServer : $ProxyPort"
+		    Write-Output "Using Proxy Server $ProxyServer : $ProxyPort" | Out-String
 	    }
 	    else
 	    {
 		    $proxy = $null
 		    # If you are going Direct.  You need this to be null, or HTTPWebrequest loops...
-		    Write-Output "Using Direct Internet Connection"
+		    Write-Output "Using Direct Internet Connection" | Out-String
 	    }
 	
         try
         {
 	        $listener.Start()
-	        Write-Output "Listening on $port"
+	        Write-Output "Listening on $port" | Out-String
 	        $client = New-Object System.Net.Sockets.TcpClient
 	        $client.NoDelay = $true
 	
@@ -856,13 +858,13 @@ function Set-Interceptor{
         }
         finally 
         {
-            Write-Output "Stopping..."
+            Write-Output "Stopping..." | Out-String
 	        $listener.Stop();
             if($AutoProxyConfig)
             {
                 UnsetSystemWideProxy $backup
                 Set-AutomaticallyDetectProxySettings ($wasEnabled)
-                Write-Output "Proxy is now disabled"
+                Write-Output "Proxy is now disabled" | Out-String
             }
         }
     }
