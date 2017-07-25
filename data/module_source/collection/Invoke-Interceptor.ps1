@@ -869,4 +869,3 @@ function Set-Interceptor{
     
     main
 }
-Set-Interceptor -ListenPort 8082 -AutoProxyConfig
